@@ -20,7 +20,7 @@ mensagem = input("\n\nDigite uma frase: ")
 print("\n\nOpções:")
 print("1 - Enviar sem criptografia")
 print("2 - Enviar com criptografia")
-opcao = input("Escolha uma opção (1 ou 2): ")
+opcao = input("\nEscolha uma opção (1 ou 2): ")
 
 # Criar o socket e conectar à máquina 2
 client_socket2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,9 +49,8 @@ elif opcao == '2':
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((IP_MAQUINA2, PORTA_MAQUINA2))
         
-        # Gerar senha_remetente aleatória
+        # Gerar senha_remetente aleatória de 2 a 50
         senha_remetente = random.randint(2, 50)
-        #print("Senha Remetente:", senha_remetente)
 
         # Gerar um número primo aleatório
         primo = random.randint(100, 1000)
@@ -60,39 +59,32 @@ elif opcao == '2':
         
         # Enviar o número primo gerado em ASCII puro
         client_socket.sendall(str(primo).encode('ascii'))
-        #print("primo", primo)
 
         # Receber o número primo menor gerado pelo destinatário
         primo_menor = int(client_socket.recv(1024).decode('ascii'))
-        #print("Número primo menor recebido:", primo_menor)
 
         # Expressao 
         resultado = (primo_menor ** senha_remetente) % primo
-        #print("Resultado da expressao", resultado)
 
         # Enviar o resultado para a máquina 2
         client_socket.sendall(str(resultado).encode('ascii'))
 
         # Receber o resultado em ASCII puro
         resultado_destinatario = int(client_socket.recv(1024).decode('ascii'))
-        #print("Resultado enviado pelo destinatário:", resultado_destinatario)
 
         # Chave
         chave_remetente = (resultado_destinatario ** senha_remetente) % primo
-        #print("Chave:", chave_remetente)
         
         chaves_remetente.append(chave_remetente)  # Adicionar a chave ao vetor de chaves
 
     # Encontrar a menor chave
     menor_chave = min(chaves_remetente)
-    #print("Menor chave encontrada:", menor_chave)
     
+    # Deixa a chave entre 126 e 32
     while menor_chave > 126:
         menor_chave = menor_chave - 126 + 32
 
-    #print("Menor chave encontrada2:", menor_chave)
-
-    # Gerar a nova mensagem com base na menor chave
+    # Gerar a mensagem criptografada com base na menor chave
     msg_criptografada = ""
     for letra in mensagem:
         valor_letra = ord(letra) + menor_chave
@@ -106,7 +98,7 @@ elif opcao == '2':
     client_socket.sendall(msg_criptografada.encode('ascii'))
 
     # Imprimir a nova mensagem na tela
-    print("Mensagem criptografada: ", msg_criptografada)
+    print("\nMensagem criptografada: " + msg_criptografada + "\n")
     
 else:
     print("Opção inválida!")
